@@ -48,11 +48,11 @@ from pathlib import Path
 from pyspark.context import SparkContext
 from pyspark.sql.session import SparkSession
 from IPython.display import display, Markdown
-from pyspark.sql.types import IntegerType, DoubleType, StringType, DateType, Row
+from pyspark.sql.types import IntegerType, DoubleType, StringType, BooleanType, DateType, Row
 from pyspark.sql.functions import when, count, col, countDistinct, \
                                     desc, asc, round, date_format, \
                                     concat_ws, expr, month, \
-                                    first, lit, max, min
+                                    first, lit, max, min, stddev, avg
 
 sc = SparkContext.getOrCreate()
 spark = SparkSession(sc)
@@ -81,18 +81,51 @@ data_df.printSchema()
 
 display(Markdown(f'the dataset consists of {total_bookings} rows'))
 
-# TODO Typecasts
-# TODO change some columnnames
-# TODO delete some column
-# TODO get 3 random samples
-# TODO lit()
-# TODO first()
-# TODO max(), min, 
-# TODO avg(), stdv(), 
-# TODO limit()
-# TODO Create manual DataFrame
-# TODO .toPandas()
+# %% preprocessing
+# perform typecasts where needed
+# change column names
+# drop columns that are not needed
 
+data_df = \
+    data_df.withColumn("is_canceled",col("is_canceled").cast("boolean"))\
+        .withColumn("lead_time",col("lead_time").cast("double"))\
+        .withColumn("arrival_date_year",col("arrival_date_year").cast("double"))\
+        .withColumn("arrival_date_week_number",col("arrival_date_week_number").cast("double"))\
+        .withColumn("arrival_date_day_of_month",col("arrival_date_day_of_month").cast("double"))\
+        .withColumn("stays_in_weekend_nights",col("stays_in_weekend_nights").cast("double"))\
+        .withColumn("stays_in_week_nights",col("stays_in_week_nights").cast("double"))\
+        .withColumn("adults",col("adults").cast("double"))\
+        .withColumn("children",col("children").cast("double"))\
+        .withColumn("babies",col("babies").cast("double"))\
+        .withColumn("is_repeated_guest",col("is_repeated_guest").cast("boolean"))\
+        .withColumn("previous_cancellations",col("previous_cancellations").cast("double"))\
+        .withColumn("previous_bookings_not_canceled",col("previous_bookings_not_canceled").cast("double"))\
+        .withColumn("booking_changes",col("booking_changes").cast("double"))\
+        .withColumn("days_in_waiting_list",col("days_in_waiting_list").cast("double"))\
+        .withColumn("adr",col("adr").cast("double"))\
+        .withColumn("required_car_parking_spaces",col("required_car_parking_spaces").cast("double"))\
+        .withColumn("total_of_special_requests",col("total_of_special_requests").cast("double"))\
+        .withColumn("reservation_status_date",col("reservation_status_date").cast("double"))\
+        .withColumnRenamed("adr", "average_daily_rate")\
+        .drop('booking_changes')
+
+# update columns
+columns = data_df.schema.names
+
+# TODO lit()
+
+# TODO Create manual DataFrame
+
+#%%
+display(Markdown('get a random sample from the dataset with spark'))
+print(data_df.sample(False, 0.1).take(2))
+
+display(Markdown('get a random sample from the dataset with pandas'))
+pandas_sample_df = data_df.toPandas()
+pandas_sample_df.sample(n=2)
+
+
+# %%
 display(Markdown('printing null values per column'))
 # thank you Raúl for this line of code!
 # it took a while to understand it, it is genius!
@@ -143,7 +176,7 @@ data_df.select([count(when(col(c).isNull() | (col(c) == "NULL"), c)).alias(c) fo
 # - 'company' - ID of the entity that made/pays the booking
 # - 'days_in_waiting_list' - number of days it took to confirm the booking
 # - 'customer_type' - customer type
-# - 'adr' - Average Daily Rate
+# - 'average_daily_rate' - Average Daily Rate
 # - 'required_car_parking_spaces' - number of parking spaces needed
 # - 'total_of_special_requests' - number of special requests
 # - 'reservation_status' - last reservation status
@@ -179,9 +212,9 @@ data_df.select([count(when(col(c).isNull() | (col(c) == "NULL"), c)).alias(c) fo
 
 # %%
 # define group variable "booking"
-booking = ['is_canceled', 'market_segment','deposit_type', 'booking_changes', 
-            'agent', 'days_in_waiting_list', 'reservation_status', 'hotel', 
-            'assigned_room_type', 'distribution_channel', 'adr']
+booking = ['is_canceled', 'market_segment','deposit_type', 'agent', 
+            'days_in_waiting_list', 'reservation_status', 'hotel', 
+            'assigned_room_type', 'distribution_channel', 'average_daily_rate']
 
 # define group variable "time"
 time = ['lead_time', 'arrival_date_year', 'arrival_date_month', 
@@ -262,7 +295,7 @@ data_df.select(get_numericals(data_df[time])).summary().show()
 
 # %%
 display(Markdown('\n print the most occuring entries of the whole guest group in descending order'))
-data_df.groupBy(guest).count().sort(desc('count')).show(10)
+data_df.groupBy(guest).count().sort(desc('count')).limit(10).show()
 
 display(Markdown('\n print the highest and lowest counts of categorical columns belonging to the guest-related group'))
 get_min_max(data_df[guest])
@@ -276,7 +309,7 @@ data_df.select(get_numericals(data_df[guest])).summary().show()
 # %% [markdown]
 # # Business Question 1: what does our customer mix look like with regards to customer_spending?
 # 
-# customer_spending is going to be categorized by the colum "average-daily-rate" (adr) as follows:
+# customer_spending is going to be categorized by the colum "average-daily-rate" as follows:
 # 
 # - "6 something went wrong"               -> adr_pp = (-infinity,0)
 # - "5 very low"            -> adr_pp = (0, 28)
@@ -290,12 +323,12 @@ data_df.select(get_numericals(data_df[guest])).summary().show()
 # %%
 # 1 Let's calculate the avere-daily-rate per guest, (currently per booking).
 # for this we need to create a total guests column, that takes into consideration, that children do not count as a "full guest" (also called PAX)
-# then we devide the adr by PAX and categorize accordingly
+# then we devide the average_daily_rate per PAX and categorize accordingly
 # guest = guest + ["customer_spending"]
 
 bq1_df = \
     data_df.withColumn("PAX", (col("adults") + 0.5 * col("children") + 0.2 * col("babies")))\
-        .withColumn("adr_pp", (col("adr") / col("PAX")))\
+        .withColumn("adr_pp", (col("average_daily_rate") / col("PAX")))\
         .withColumn("customer_spending", 
             when(col("adr_pp")<=0,
                 "6 something went wrong")
@@ -372,23 +405,22 @@ ba2_df = \
     .sum("very_high", "high", "average", "low", "very_low", "something_went_wrong")
 
 display(Markdown("printing the ratio of customer-spending 'very high'"))
-ba2_df.withColumn(
-    "ratio", round((
-        col("sum(very_high)") / 
-        (col("sum(very_high)") + col("sum(high)") + col("sum(average)") + col("sum(low)") + col("sum(very_low)") + col("sum(something_went_wrong)")))
-        ,2))\
-    .sort(desc("ratio")).show()
+ba2_df = \
+    ba2_df.withColumn(
+            "ratio", round((
+                col("sum(very_high)") / 
+                (col("sum(very_high)") + col("sum(high)") + col("sum(average)") + col("sum(low)") + col("sum(very_low)") + col("sum(something_went_wrong)")))
+                ,2))\
+        .sort(desc("ratio")).show()
 
 # %% [markdown]
 # # Business Question 3: what are the customer_spending ratios of each group by country
 # group by waitinglist, create profiling
-# TODO - change prints to: display(Markdown("**Top 20 origin airports** with highest severe delayed (**unacceptable**) flights ratio (in \%):"))
-
 
 # %%
 display(Markdown("printing the customer-spending mix per country"))
 bq3_df = \
-    bq2_df.groupBy("country")\
+    bq2_df.groupBy("hotel")\
         .pivot("customer_spending")\
         .agg(count("customer_spending"))\
         .orderBy(
@@ -402,6 +434,19 @@ bq3_df = \
 
 # %%
 # TODO perform a pure SQL query for fun (need to persist DF as table tough)
+#%%
+
+display(Markdown("**customer-spending mix per country"))
+bq2_df.groupBy("country")\
+    .agg(round(avg("very_high"),2).alias("average_high"),
+        round(min("adr_pp"),2).alias("adr_pp_min"),
+        round(max("adr_pp"),2).alias("adr_pp_max"),
+        round(stddev("very_high"),2).alias("stddev_high"))\
+    .orderBy(
+        col("average_high").desc())\
+    .where((col("stddev_high") != 0) & (col("stddev_high").isNotNull()) & (col("stddev_high") != "NaN"))\
+    .show()
+#%%
 # TODO idea for Join: join a table of weekdays (monday, ...)
 
-
+# %%
