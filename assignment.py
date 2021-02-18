@@ -44,11 +44,10 @@
 # %%
 import findspark
 findspark.init()
-from pathlib import Path
 from pyspark.context import SparkContext
 from pyspark.sql.session import SparkSession
 from IPython.display import display, Markdown
-from pyspark.sql.types import IntegerType, DoubleType, StringType, BooleanType, DateType, Row
+from pyspark.sql.types import IntegerType, DoubleType, StringType,
 from pyspark.sql.functions import when, count, col, countDistinct, \
                                     desc, asc, round, date_format, \
                                     concat_ws, expr, month, \
