@@ -7,7 +7,8 @@ idea for Join: join a table of weekdays (monday, ...)
 
 <h1 style="text-align: center;"> Spark Individual Assignment - Maximilian Pichler </h1>
 
-![[pexels-matheus-bertelli-573241.jpg]]
+
+![](pexels-matheus-bertelli-573241.jpg)
 
 ## Introduction
 For this assignment we had to choose a dataset which we then analyse and process using Spark's Python API PySpark. The goal was to implement all the preprocessing steps covered during the first part of the class of the Master in Big Data and Business Analytics at IE - HST.
