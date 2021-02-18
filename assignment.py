@@ -127,7 +127,6 @@ columns = data_df.schema.names
 
 # TODO lit()
 
-# TODO Create manual DataFrame
 
 #%%
 display(Markdown('get a random sample from the dataset with spark'))
@@ -439,13 +438,12 @@ ba2_df = \
         .sort(desc("ratio")).show()
 
 # %% [markdown]
-# # Business Question 3: what are the customer_spending ratios of each group by country
-# group by waitinglist, create profiling
+# # Business Question 3: what are the customer_spending ratios per weekday, for each of the two hotels
 
 # %%
 display(Markdown("printing the customer-spending mix per country"))
 bq3_df = \
-    bq2_df.groupBy("hotel")\
+    bq2_df.groupBy("hotel", "day_of_week")\
         .pivot("customer_spending")\
         .agg(count("customer_spending"))\
         .orderBy(
@@ -472,7 +470,6 @@ bq2_df.groupBy("country")\
     .where((col("stddev_high") != 0) & (col("stddev_high").isNotNull()) & (col("stddev_high") != "NaN"))\
     .show()
 #%%
-# TODO idea for Join: join a table of weekdays (monday, ...)
 
 # %%
 bq2_df.groupBy("day_of_week").count().show()
