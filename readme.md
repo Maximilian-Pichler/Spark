@@ -1,10 +1,9 @@
-TODO:
-Change some column names
-do some typecasting
 get some random samples to 
 delete some colum
 perform a pure SQL query for fun (need to persist DF as table tough)
 idea for Join: join a table of weekdays (monday, ...)
+---
+
 
 <h1 style="text-align: center;"> Spark Individual Assignment - Maximilian Pichler </h1>
 
@@ -15,19 +14,46 @@ For this assignment we had to choose a dataset which we then analyse and process
 
 In addition to the class-material, we where allowed to use the official documentation and suggested readings provided by the professor. For this reason I have acquired the book "Spark - The Definitive Guide"by Bill Chambers and Matei Zaharia to further make myself comfortable with the capabilities of Spark and how to use them efficienlty.
 
-Functions covered in the course
-select
-alias
-col
+---
 
-[count](www.link to documentation.com)
-sum
-avg
-agg
-join
-pivot
-expr
-
+Classes, Methods & Functions covered in this assignment
+- SparkContext
+- SparkSession
+- **createDataFrame**
+---
+- printSchema/schema
+- **StructType**
+- **StructField**
+- **withColumnRenamed**
+---
+- select
+- groupBy
+- orderBy
+- show
+- first()
+---
+- when/otherwise
+- withColumn
+- drop
+---
+- isNull
+- **isNotNull**
+- countDistinct
+---
+- col
+- alias
+---
+- [count](www.link to documentation.com)
+- sum
+- avg
+- agg
+- **join**
+- pivot
+- expr
+- sort
+- **lit**
+- summary
+---
 
 ## What: Background / Scenario
 The first step of the process was choosing a dataset that would fit the requirements of having at least 100.000 rows. Fortunately, there are many data sources available nowadays. After a few hours of research I ended up with a handfull of datasets of high quality that would fit these requirements
@@ -113,6 +139,7 @@ For the analysis several steps need to be performed:
 
 
 
+---
 
 <h1 style="text-align: center;"> Bonus</h1>
 
