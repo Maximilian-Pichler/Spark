@@ -3,6 +3,9 @@
 
 ![](pexels-matheus-bertelli-573241.jpg)
 
+> **A spark is a little thing, yet it may kindle the world.** 
+> _-Martin Farquhar Tupper_
+
 ## Introduction
 For this assignment we had to choose a dataset which we then analyse and process using Spark's Python API PySpark. The goal was to implement all the preprocessing steps covered during the first part of the class of the Master in Big Data and Business Analytics at IE - HST.
 
@@ -90,7 +93,6 @@ Data description [Source]()
 | total_of_special_requests      | double    | Number of special requests made by the customer (e.g. twin bed or high floor)                                                                                                                                                                                                                                                                                                                                                |
 | reservation_status             | character | Reservation last status, assuming one of three categories:  Canceled – booking was canceled by the customer; Check-Out – customer has checked in but already departed;  No-Show – customer did not check-in and did inform the hotel of the reason why                                                                                                                                                                       |
 | reservation_status_date        | double    | Date at which the last status was set. This variable can be used in conjunction with the ReservationStatus to understand when was the booking canceled or when did the customer checked-out of the hotel                                                                                                                                                                                                                     |
-|                                |           |                                                                                                                                                                                                                                                                                                                                                                                                                              |
 
 
 ## Why: Goal of Analysis
@@ -111,14 +113,14 @@ For the analysis several steps need to be performed:
 - load the dataset
 - EDA & Preprocessing:
 	- get random samples
-	- Colum Names
+	- change colum names
 	- Cast Datatypes
 	- define entities, metrics and dimensions
 	- group columns
 - Basic Group Profiling
 	- get summary statistics from each group
 - Answer Business Wustions
-	- BQ1
+	- BQ1: # what does our customer-spending mix look like?
 		- transformations, aggregations, groupings
 	- BQ2
 	- 
