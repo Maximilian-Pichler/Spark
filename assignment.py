@@ -47,7 +47,7 @@ findspark.init()
 from pyspark.context import SparkContext
 from pyspark.sql.session import SparkSession
 from IPython.display import display, Markdown
-from pyspark.sql.types import IntegerType, DoubleType, StringType,
+from pyspark.sql.types import StructType, StructField, IntegerType, DoubleType, StringType, DateType
 from pyspark.sql.functions import when, count, col, countDistinct, \
                                     desc, asc, round, date_format, \
                                     concat_ws, expr, month, \
@@ -68,6 +68,20 @@ data_df = \
 #data_df.cache()
 
 
+
+
+dow_schema = StructType(\
+    [StructField("date",DateType(),True),\
+     StructField("day_of_week",StringType(),True)])
+
+days_of_week = \
+    spark.read.schema(dow_schema)\
+        .option("header", "true")\
+        .option("sep", ";")\
+        .csv('Data/Spark Lab/Individual Assignment/day_of_week3.csv')
+
+days_of_week.first()
+
 # %%
 # assigning the schema and column names to variables
 schema = data_df.schema
@@ -87,12 +101,12 @@ display(Markdown(f'the dataset consists of {total_bookings} rows'))
 
 data_df = \
     data_df.withColumn("is_canceled",col("is_canceled").cast("boolean"))\
-        .withColumn("lead_time",col("lead_time").cast("double"))\
-        .withColumn("arrival_date_year",col("arrival_date_year").cast("double"))\
-        .withColumn("arrival_date_week_number",col("arrival_date_week_number").cast("double"))\
-        .withColumn("arrival_date_day_of_month",col("arrival_date_day_of_month").cast("double"))\
-        .withColumn("stays_in_weekend_nights",col("stays_in_weekend_nights").cast("double"))\
-        .withColumn("stays_in_week_nights",col("stays_in_week_nights").cast("double"))\
+        .withColumn("lead_time",col("lead_time").cast("int"))\
+        .withColumn("arrival_date_year",col("arrival_date_year").cast("int"))\
+        .withColumn("arrival_date_week_number",col("arrival_date_week_number").cast("int"))\
+        .withColumn("arrival_date_day_of_month",col("arrival_date_day_of_month").cast("int"))\
+        .withColumn("stays_in_weekend_nights",col("stays_in_weekend_nights").cast("int"))\
+        .withColumn("stays_in_week_nights",col("stays_in_week_nights").cast("int"))\
         .withColumn("adults",col("adults").cast("double"))\
         .withColumn("children",col("children").cast("double"))\
         .withColumn("babies",col("babies").cast("double"))\
@@ -100,7 +114,7 @@ data_df = \
         .withColumn("previous_cancellations",col("previous_cancellations").cast("double"))\
         .withColumn("previous_bookings_not_canceled",col("previous_bookings_not_canceled").cast("double"))\
         .withColumn("booking_changes",col("booking_changes").cast("double"))\
-        .withColumn("days_in_waiting_list",col("days_in_waiting_list").cast("double"))\
+        .withColumn("days_in_waiting_list",col("days_in_waiting_list").cast("int"))\
         .withColumn("adr",col("adr").cast("double"))\
         .withColumn("required_car_parking_spaces",col("required_car_parking_spaces").cast("double"))\
         .withColumn("total_of_special_requests",col("total_of_special_requests").cast("double"))\
@@ -360,12 +374,12 @@ bq2_df = \
         withColumn("month",
             when(col("arrival_date_month") == "January", 1)
             .when(col("arrival_date_month") == "February", 2)
-            .when(col("arrival_date_month")== "March", 3)
+            .when(col("arrival_date_month") == "March", 3)
             .when(col("arrival_date_month") == "April", 4)
-            .when(col("arrival_date_month")== "May", 5)
-            .when(col("arrival_date_month")== "June", 6)
-            .when(col("arrival_date_month")== "July", 7)
-            .when(col("arrival_date_month")== "August", 8)
+            .when(col("arrival_date_month") == "May", 5)
+            .when(col("arrival_date_month") == "June", 6)
+            .when(col("arrival_date_month") == "July", 7)
+            .when(col("arrival_date_month") == "August", 8)
             .when(col("arrival_date_month") == "September", 9)
             .when(col("arrival_date_month") == "October", 10)
             .when(col("arrival_date_month") == "November", 11)
@@ -374,12 +388,24 @@ bq2_df = \
 # next we can create a Date-colum "booking_date".
 # finally, we can calculate the booking date, by subtracting the lead_time from the booking_date 
     # expr() is needed in order to pass the column to date_add    
+# %%
 bq2_df = \
     bq2_df.withColumn("arrival_date", 
             date_format(concat_ws('-', bq2_df.arrival_date_year, bq2_df.month , bq2_df.arrival_date_day_of_month), 'yyyy-MM-dd'))\
-        .withColumn("booking_date", expr("date_add(to_date(arrival_date,'yyyy-MM-dd'),-cast(lead_time as int))"))                
 
+# %%       
+bq2_df = \
+    bq2_df.withColumn("booking_date", 
+        expr("date_add(to_date(arrival_date,'yyyy-MM-dd'),-cast(lead_time as int))"))                
 
+#%%
+# join dataframe with day_of_week dataframe
+bq2_df = \
+    bq2_df.join(days_of_week, 
+        bq2_df["arrival_date"] == days_of_week["date"], 
+        how = 'left')
+
+# %%
 # add dummy variables for customer_spending
 bq2_df = \
     bq2_df.withColumn("very_high", 
@@ -396,7 +422,7 @@ bq2_df = \
             when(col("customer_spending") == "6 something went wrong", 1).otherwise(0))\
 
 
-
+# %%
 # with the dataframe created above, we can finally go about answering the business question
 # calculate ratio of "1 very high" per month
 ba2_df = \
@@ -449,3 +475,4 @@ bq2_df.groupBy("country")\
 # TODO idea for Join: join a table of weekdays (monday, ...)
 
 # %%
+bq2_df.groupBy("day_of_week").count().show()

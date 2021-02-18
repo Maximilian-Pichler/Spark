@@ -4,7 +4,8 @@
 ![](pexels-matheus-bertelli-573241.jpg)
 
 > **A spark is a little thing, yet it may kindle the world.** 
-> _-Martin Farquhar Tupper_
+
+\- _Martin Farquhar Tupper_
 
 ## Introduction
 For this assignment we had to choose a dataset which we then analyse and process using Spark's Python API PySpark. The goal was to implement all the preprocessing steps covered during the first part of the class of the Master in Big Data and Business Analytics at IE - HST.
@@ -15,14 +16,13 @@ In addition to the class-material, we where allowed to use the official document
 
 Classes, Methods & Functions covered in this assignment
 ```py
-
 SparkContext()
 SparkSession()
-**createDataFrame()**
+createDataFrame()
 printSchema()/schema()
-**StructType()**
-**StructField()**
-**withColumnRenamed()**
+StructType()
+StructField()
+withColumnRenamed()
 select()
 groupBy()
 orderBy()
@@ -32,7 +32,7 @@ withColumn()
 when()/otherwise() 
 drop()
 isNull()
-**isNotNull()**
+isNotNull()
 countDistinct()
 col()
 alias()
@@ -40,11 +40,11 @@ count()
 sum()
 avg()
 agg()
-**join()**
+join()
 pivot()
 expr()
 sort()
-**lit()**
+lit()
 summary()
 ```
 
