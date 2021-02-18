@@ -1,10 +1,3 @@
-get some random samples to 
-delete some colum
-perform a pure SQL query for fun (need to persist DF as table tough)
-idea for Join: join a table of weekdays (monday, ...)
----
-
-
 <h1 style="text-align: center;"> Spark Individual Assignment - Maximilian Pichler </h1>
 
 
@@ -18,42 +11,40 @@ In addition to the class-material, we where allowed to use the official document
 ---
 
 Classes, Methods & Functions covered in this assignment
-- SparkContext
-- SparkSession
-- **createDataFrame**
----
-- printSchema/schema
-- **StructType**
-- **StructField**
-- **withColumnRenamed**
----
-- select
-- groupBy
-- orderBy
-- show
-- first()
----
-- when/otherwise
-- withColumn
-- drop
----
-- isNull
-- **isNotNull**
-- countDistinct
----
-- col
-- alias
----
-- [count](www.link to documentation.com)
-- sum
-- avg
-- agg
-- **join**
-- pivot
-- expr
-- sort
-- **lit**
-- summary
+```py
+
+SparkContext()
+SparkSession()
+**createDataFrame()**
+printSchema()/schema()
+**StructType()**
+**StructField()**
+**withColumnRenamed()**
+select()
+groupBy()
+orderBy()
+show()
+first()
+withColumn()
+when()/otherwise() 
+drop()
+isNull()
+**isNotNull()**
+countDistinct()
+col()
+alias()
+count()
+sum()
+avg()
+agg()
+**join()**
+pivot()
+expr()
+sort()
+**lit()**
+summary()
+```
+
 ---
 
 ## What: Background / Scenario
