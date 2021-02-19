@@ -1,14 +1,6 @@
 # %%
-
-
 # TODO write introduction with goals set and what could be improved in the future
-        # not only copy paste from stack overflow, profssor, but understand the code, play around with function-parameters from professor
-        # use code from the book "Spark - The Definitive Guide" by Bill Chambers and Matei Zaharia -> i have bought it because I am such a Nerd
-        # have a well commented/documented & modular code 
-        # create some useful functions and automate as much as possible
-        # use all of the following capabilities:
-        # flightsDF.sample(False, 0.1).take(2)
-        #  
+        # not only copy paste from stack ove
 
 # %% [markdown]
 # # Spark Individual Assignment - Maximilian Pichler - MBD2020
@@ -58,7 +50,6 @@ spark = SparkSession(sc)
 
 # %% [markdown]
 # # Import Data
-# 
 
 # %%
 data_df = \
@@ -66,9 +57,6 @@ data_df = \
         .option("header", "true")\
         .csv('Data/Spark Lab/Individual Assignment/hotel_bookings.csv')
 #data_df.cache()
-
-
-
 
 dow_schema = StructType(\
     [StructField("date",DateType(),True),\
@@ -92,7 +80,7 @@ total_bookings = data_df.count()
 display(Markdown('printing the schema of the dataset'))
 data_df.printSchema()
 
-display(Markdown(f'the dataset consists of {total_bookings} rows'))
+display(Markdown(f'the dataset consists of **{total_bookings}** rows'))
 
 # %% preprocessing
 # perform typecasts where needed
@@ -101,26 +89,19 @@ display(Markdown(f'the dataset consists of {total_bookings} rows'))
 
 data_df = \
     data_df.withColumn("is_canceled",col("is_canceled").cast("boolean"))\
-        .withColumn("lead_time",col("lead_time").cast("int"))\
-        .withColumn("arrival_date_year",col("arrival_date_year").cast("int"))\
-        .withColumn("arrival_date_week_number",col("arrival_date_week_number").cast("int"))\
-        .withColumn("arrival_date_day_of_month",col("arrival_date_day_of_month").cast("int"))\
-        .withColumn("stays_in_weekend_nights",col("stays_in_weekend_nights").cast("int"))\
-        .withColumn("stays_in_week_nights",col("stays_in_week_nights").cast("int"))\
-        .withColumn("adults",col("adults").cast("double"))\
-        .withColumn("children",col("children").cast("double"))\
-        .withColumn("babies",col("babies").cast("double"))\
         .withColumn("is_repeated_guest",col("is_repeated_guest").cast("boolean"))\
-        .withColumn("previous_cancellations",col("previous_cancellations").cast("double"))\
-        .withColumn("previous_bookings_not_canceled",col("previous_bookings_not_canceled").cast("double"))\
-        .withColumn("booking_changes",col("booking_changes").cast("double"))\
-        .withColumn("days_in_waiting_list",col("days_in_waiting_list").cast("int"))\
         .withColumn("adr",col("adr").cast("double"))\
-        .withColumn("required_car_parking_spaces",col("required_car_parking_spaces").cast("double"))\
-        .withColumn("total_of_special_requests",col("total_of_special_requests").cast("double"))\
-        .withColumn("reservation_status_date",col("reservation_status_date").cast("double"))\
         .withColumnRenamed("adr", "average_daily_rate")\
-        .drop('booking_changes')
+        .drop('required_car_parking_spaces')\
+        .drop('previous_cancellations')\
+        .drop('previous_bookings_not_canceled')\
+        .drop('assigned_room_type')\
+        .drop('booking_changes')\
+        .drop('deposit_type')\
+        .drop('agent')\
+        .drop('company')\
+        .drop('reservation_status_date')\
+
 
 # update columns
 columns = data_df.schema.names
@@ -159,42 +140,7 @@ data_df.select([count(when(col(c).isNull() | (col(c) == "NULL"), c)).alias(c) fo
 data_df.select([count(when(col(c).isNull() | (col(c) == "NULL"), c)).alias(c) for c in columns[29:]]).show()
 
 # %% [markdown]
-# Next, lets try to define some groups of columns. For this reason, we will first check [the datasource](https://www.kaggle.com/jessemostipak/hotel-booking-demand) and get ourselves familiar with the contents of each column:
-# 
-# - 'hotel' - Category telling us whether it is a Resort Hotel or a City Hotel.
-# - 'is_canceled' - indication whether the booking was cancelled
-# - 'lead_time' - time between booking and the arrival date
-# - 'arrival_date_year' - Year of arrival
-# - 'arrival_date_month' - month of arrival
-# - 'arrival_date_week_number' - day of week of arrival
-# - 'arrival_date_day_of_month' - day of month of arrival
-# - 'stays_in_weekend_nights' - number of weekend nights of the stay
-# - 'stays_in_week_nights' - number of nights of the stay
-# - 'adults' - number of adults
-# - 'children' - number of children
-# - 'babies' - number of babies
-# - 'meal' - type of meal booked (BB, HB, FB, SC/Undefined)
-# - 'country' - Country of origin
-# - 'market_segment' - Market Segments (TA = Travel Agent)
-# - 'distribution_channel' - booking distribution channel
-# - 'is_repeated_guest' - whether the guest had previous bookings
-# - 'previous_cancellations' - whether the guest had previous chancellations
-# - 'previous_bookings_not_canceled' - whether the guest had previous bookings that where not cancelled
-# - 'reserved_room_type' - reserved room type
-# - 'assigned_room_type' - assigned room type
-# - 'booking_changes' - number of changes to the booking
-# - 'deposit_type' - deposit type
-# - 'agent' - travel agency ID
-# - 'company' - ID of the entity that made/pays the booking
-# - 'days_in_waiting_list' - number of days it took to confirm the booking
-# - 'customer_type' - customer type
-# - 'average_daily_rate' - Average Daily Rate
-# - 'required_car_parking_spaces' - number of parking spaces needed
-# - 'total_of_special_requests' - number of special requests
-# - 'reservation_status' - last reservation status
-# - 'reservation_status_date' - date at which the las reservation status was set
-# 
-# 
+# Next, lets try to define some groups of columns. For this reason, we will first check [the datasource](https://www.kaggle.com/jessemostipak/hotel-booking-demand) and get ourselves familiar with the contents of each column.
 # With this information at hand, we can further categorize the data, helping us to better understand what the data can tell us.
 # 
 # # Entries, Metrics & Dimensions
@@ -204,6 +150,7 @@ data_df.select([count(when(col(c).isNull() | (col(c) == "NULL"), c)).alias(c) fo
 # - Guests (dimension)
 # - Hotels (dimension)
 # - Distribution Channels (dimension)
+# - Time
 # 
 # ## Metrics: 
 # - average_daily_rate
@@ -319,7 +266,7 @@ display(Markdown('\n print summary statistics of guest-numricals'))
 data_df.select(get_numericals(data_df[guest])).summary().show()
 
 # %% [markdown]
-# # Business Question 1: what does our customer mix look like with regards to customer_spending?
+# # Business Question 1: what does the customer-spending mix look like?
 # 
 # customer_spending is going to be categorized by the colum "average-daily-rate" as follows:
 # 
