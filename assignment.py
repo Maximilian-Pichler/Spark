@@ -1,39 +1,4 @@
 # %%
-# TODO write introduction with goals set and what could be improved in the future
-        # not only copy paste from stack ove
-
-# %% [markdown]
-# # Spark Individual Assignment - Maximilian Pichler - MBD2020
-# 
-# As part of our Spark Class, we have learned how to use the pyhton API "pyspark" to perform dataprocessing with spark.
-# 
-# This is the notebook used for the analysis and processing of the hotel dataset from [kaggle.com](https://www.kaggle.com/jessemostipak/hotel-booking-demand)
-# 
-# 
-# ## Content
-# ### Import libraries
-#     - pyspark
-#     - KaggleAPI
-#     
-# ### Import data
-#     - via CSV
-#     - via Kaggle API
-# 
-# ### Perform basic EDA
-#     - infer schema from dataset
-#     - get shape of dataset
-#     - identify entities, metrics and dimesions
-#     - categorize columns
-# 
-# ### Perform basic profiling based on previous grouping
-#     - count and display unique values
-#     - create summary statistics of numeric columns
-# ### Answer Business Questions:
-#     - Question 1: what are our most 3 average customers
-#     - Question 2: at what time do we get the most 3 average bookings
-#     - Question 3: what are features of bookings that take long (waitinglist)
-
-# %%
 import findspark
 findspark.init()
 from pyspark.context import SparkContext
@@ -56,7 +21,7 @@ data_df = \
     spark.read.option("inferSchema", "true")\
         .option("header", "true")\
         .csv('Data/Spark Lab/Individual Assignment/hotel_bookings.csv')
-#data_df.cache()
+data_df.cache()
 
 dow_schema = StructType(\
     [StructField("date",DateType(),True),\
@@ -72,7 +37,6 @@ days_of_week.first()
 
 # %%
 # assigning the schema and column names to variables
-schema = data_df.schema
 columns = data_df.schema.names
 total_bookings = data_df.count()
 
@@ -403,7 +367,6 @@ bq3_df = \
 
 
 # %%
-# TODO perform a pure SQL query for fun (need to persist DF as table tough)
 #%%
 
 display(Markdown("**customer-spending mix per country"))
@@ -417,6 +380,10 @@ bq2_df.groupBy("country")\
     .where((col("stddev_high") != 0) & (col("stddev_high").isNotNull()) & (col("stddev_high") != "NaN"))\
     .show()
 #%%
-
+# TODO persist this dataframe in cache for SQL Query
+"""select *, count()
+from table
+groupby day_of_week"""
 # %%
 bq2_df.groupBy("day_of_week").count().show()
+
