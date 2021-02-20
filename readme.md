@@ -170,7 +170,7 @@ Loading the dataset with `option("inferSchema", "true")` we can see that PySpark
 For the second csv - which only contains two columns - the schema is created manually.
 
 **Renaming Columns**
-
+We rename the column "adr" to "average_daily_rate" to make it immediately recognizeble what it represents
 
 **NULL Values**
 Last but not least, we will check the quality of the data, by checking how many missing values it contains: 
@@ -185,7 +185,7 @@ Having an overview of the data we now start labeling Entities, Metrics and Dimen
 | Entities           | Metrics                 | Dimensions |
 | ------------------ | ----------------------- | ---------- |
 | Bookings           | average_daily_rate      | time       |
-| Guests (dimension) | number of cancellations | agents     |
+| Guests (dimension) | number of cancellations | agent     |
 | Time (dimension)   | stays in nights         | countries  |
 | hotel (dimension)  | lead_time               | hotel      |
 | ...                | ...                     | ...        |

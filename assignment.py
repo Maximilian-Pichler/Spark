@@ -62,7 +62,6 @@ data_df = \
         .drop('assigned_room_type')\
         .drop('booking_changes')\
         .drop('deposit_type')\
-        .drop('agent')\
         .drop('company')\
         .drop('reservation_status_date')\
 
@@ -93,7 +92,6 @@ data_df.select([count(when(col(c).isNull(), c)).alias(c) for c in columns[29:]])
 
 # %% [markdown]
 # In this data set, consisting of 119.390 rows we can see a mix of integer-, double- and string-type data. The initial check for NULL values (with .isNull()) suggested that there are no missing values. However, running the code again with == 'NULL' we can see that the columns "company", "agent", and "country" have some missing values.
-
 # %%
 display(Markdown('printing null values per column'))
 # thank you Raúl for this line of code!
@@ -135,18 +133,17 @@ data_df.select([count(when(col(c).isNull() | (col(c) == "NULL"), c)).alias(c) fo
 
 # %%
 # define group variable "booking"
-booking = ['is_canceled', 'market_segment','deposit_type', 'agent', 
-            'days_in_waiting_list', 'reservation_status', 'hotel', 
-            'assigned_room_type', 'distribution_channel', 'average_daily_rate']
+booking = ['hotel', 'is_canceled', 'market_segment', 'agent', 
+            'days_in_waiting_list', 'reservation_status', 
+             'distribution_channel', 'average_daily_rate']
 
 # define group variable "time"
 time = ['lead_time', 'arrival_date_year', 'arrival_date_month', 
         'arrival_date_week_number', 'arrival_date_day_of_month', 
-        'stays_in_weekend_nights', 'stays_in_week_nights', 'reservation_status_date']
+        'stays_in_weekend_nights', 'stays_in_week_nights']
 
 # define group variable "guests"
-guest = ['adults', 'children', 'babies', 'country', 'is_repeated_guest', 
-        'previous_cancellations', 'company', 'required_car_parking_spaces', 
+guest = ['adults', 'children', 'babies', 'country', 'is_repeated_guest',  
         'meal', 'reserved_room_type'] 
 
 # %% [markdown]
