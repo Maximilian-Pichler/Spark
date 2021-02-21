@@ -172,19 +172,19 @@ In order to get an overview of the data, we have multiple possibilities. The fir
 The second tool to better understand the data is to use python and PySpark capabilities for Exploratory Data Analysis (EDA). This way, we can easily print the schema, get the shape, and inform ourselves about the datatypes of the dataset.
  
 #### Preprocessing
-**Schema**
+##### Schema
 Loading the dataset with `option("inferSchema", "true")` we can see that PySpark already guessed most of the datatypes correctly and only recast the data types of a few columns.
 For the second CSV - which only contains two columns - the schema is created manually.
 
-**Renaming Columns**
+##### Renaming Columns
 We rename the column "adr" to "average_daily_rate" to make it immediately recognizable what it represents.
 
-**NULL Values**
+##### NULL Values
 Finally, we will check the quality of the data by counting how many missing values it contains. Here we can see that NULL values might come in a different format, as the first query shows zero NULL values and the second - with `(col(c) \== "NULL")` show at least a few.
 - country: 488 NULL Values
 - agent: 16340^[later in the report we see that there is also a "undefined" value in this colum. One could also decide to reassign the null values to the "undefined" or vice versa]
 
-**Performance Tuning - dropping & caching**
+##### Performance Tuning - dropping & caching
 To work efficiently, some columns - that are not essential for answering the business questions - will be dropped to improve the processing performance. 
 Spark offers multiple ways of persisting data on DISK_ONLY, MEMORY_ONLY, DISK & MEMORY, and OFF_HEAP. We make use of the `cache()` function, which calls `persist(StorageLevel.MEMORY_AND_DISK)`, making the best use of the RAM available to the Virtual Machine.^[Source: https://sparkbyexamples.com/spark/spark-difference-between-cache-and-persist]
 
@@ -225,16 +225,16 @@ These preparations allow us to execute the same code and only change the group t
 After finishing the EDA, we are comfortable with the micro-, macro-, and meta-level data and can tackle the business questions.
 
 #### Interesting Findings
-**booking-related**
+##### booking-related
 - someone waited 391 days to get the booking confirmed
 - someone had an average daily rate of 5400€ (the average is 94€)
 - one agent is responsible for 1/3 of the bookings for both hotels
 
-**timing-related**
+##### timing-related
 - someone booked a room more than two years in advance
 - January is the least popular month for staying in these hotels
 
-**guest-related**
+##### guest-related
 - a fifth of the bookings happen by couples from Portugal, that travel with children or babies, order Bed&Breakfast, room type A and stay at the hotel for the first time
 - Roomtype "L" has only been booked six out of 119390 times
 
@@ -242,12 +242,12 @@ After finishing the EDA, we are comfortable with the micro-, macro-, and meta-le
 #### Business Question 1
 To answer this business question, we want to create categories for average daily spendings per person. Before doing so, we need to calculate the number of persons per booking. For this, we implement the formula provided with the business question. After calculating this, we can then divide the average spending rate of the booking by the number of persons and get the average daily spending per person. 
 
-*pax = persons per booking
-a = adults
-c = children
-b = babies
-adspp = average daily spending per pax
-ads = average daily spending*
+- pax = persons per booking
+- a = adults
+- c = children
+- b = babies
+- adspp = average daily spending per pax
+- ads = average daily spending*
 
 $$
 pax = a + c * 0.5 + b * 0.2 \
