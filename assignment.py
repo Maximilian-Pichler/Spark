@@ -69,9 +69,6 @@ data_df = \
 # update columns
 columns = data_df.schema.names
 
-# TODO lit()
-
-
 #%%
 display(Markdown('get a random sample from the dataset with spark'))
 print(data_df.sample(False, 0.1).take(2))
@@ -169,13 +166,15 @@ def get_min_max(data_df):
     for category in get_categoricals(data_df):
         first = data_df.groupBy(category).count().sort(desc('count')).first()
         last = data_df.groupBy(category).count().sort(asc('count')).first()
+        total = data_df.groupBy(category).agg(count(lit(1)))
         display(Markdown("""
-| %s | %s |
-|----|----|
-| %s | %s |
+| %s | %s | %s |
+|----|----|----|
+| %s | %s | %s |
 """ % (f"least_{category}", f"most_{category}",
     "%s (%d occurrences)" % (first[category], first["count"]), 
-    "%s (%d occurrences)" % (last[category], last["count"]))))
+    "%s (%d occurrences)" % (last[category], last["count"]),
+    "%s (%d occurrences)" % (total[category], last["count"]))))
 
 # %% [markdown]
 # # Basic profiling of booking-related data
@@ -377,7 +376,7 @@ bq2_df.groupBy("country")\
     .where((col("stddev_high") != 0) & (col("stddev_high").isNotNull()) & (col("stddev_high") != "NaN"))\
     .show()
 #%%
-# TODO persist this dataframe in cache for SQL Query
+
 """select *, count()
 from table
 groupby day_of_week"""
