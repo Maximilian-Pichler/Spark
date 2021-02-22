@@ -317,21 +317,3 @@ Concerning the Question from IT, we might go back to the analyst and discuss the
 For future analysis or processing, we should change the data source to something like a database to guarantee that the data is up-to-date. We might also implement a pipeline to ingest, process, and finally serve the data to a dashboard that the CEO can access. This way, it is possible to track the KPIs in near-real-time.
 
 ---
-
-<h1 style="text-align: center;"> Bonus: PiCluster </h1>
-
-![](signal-2021-02-20-210627.jpeg)
-As indicated in the forum, I started playing around with RBPis a few months ago and just briefly wanted to show off some of the achievements so far :)
-
-- Setting up the networking part for communication between the three nodes and the master
-- Getting lightweight Kubernetes and the Kubernetes Dashboard to run
-- Installing and configuring Prometheus and Grafana for resource-monitoring
-- Installing a distributed database (CockroachDB)
-- Setting up Jupyter and Tensorflow
-
-Jupyter only runs on a single node, so installing Spark to harness the cluster's power is now the next step. 
-
-This last part is not (only) about showing off. It is to thank professors like you, Jorge, and Luis. One immediately recognizes that you like what you do in class, and with your inspiring attitude, you encourage students to go the extra mile and learn new things. Before starting the Master's at IE, I haven't even touched a virtual machine and never thought about what is possible with a little dedication.
-
-![](Screenshot1.png)
-![](Screenshot2.png)
