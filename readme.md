@@ -1,7 +1,7 @@
 <h1 style="text-align: center;"> Spark Individual Assignment - Maximilian Pichler </h1>
 
 
-![](pexels-matheus-bertelli-573241.jpg)
+![](content/pexels-matheus-bertelli-573241.jpg)
 
 > *A spark is a little thing, yet it may kindle the world.*
 \-  _Martin Farquhar Tupper_
@@ -85,7 +85,7 @@ Usually, HADOOP's data is stored in databases, but this is our first day at work
 
 <h1 style="text-align: center;"> Customer Spending through the Lens of Sales, Marketing, and Finance - a Report </h1>
 
-![](pexels-hosein-ashrafosadat-243204.jpg)
+![](content/pexels-hosein-ashrafosadat-243204.jpg)
 
 
 ## What: Background
